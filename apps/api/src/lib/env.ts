@@ -29,7 +29,8 @@ requireDatabaseUrls();
 
 export const env = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
-  apiPort: Number(process.env.API_PORT ?? 4000),
+  // Prefer PLATFORM PORT (Render/Railway/Fly); fall back to API_PORT for local.
+  apiPort: Number(process.env.PORT ?? process.env.API_PORT ?? 4000),
   frontendUrl: process.env.FRONTEND_URL ?? 'http://localhost:3000',
   sessionSecret: required('SESSION_SECRET', 32),
   encryptionKey: required('ENCRYPTION_KEY', 64),
