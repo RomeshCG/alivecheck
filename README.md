@@ -66,7 +66,7 @@ postgresql://postgres:...@db.YOUR_PROJECT_REF.supabase.co:5432/postgres?sslmode=
 Example `.env` for your project:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=https://bamhpwjygxoitwwymreu.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_publishable_or_anon_key
 SUPABASE_DB_PASSWORD=your_database_password
 SESSION_SECRET=...

@@ -29,21 +29,21 @@ describe('Supabase env helpers', () => {
   }
 
   it('extracts project ref from NEXT_PUBLIC_SUPABASE_URL', () => {
-    expect(projectRefFromSupabaseUrl('https://bamhpwjygxoitwwymreu.supabase.co')).toBe(
-      'bamhpwjygxoitwwymreu',
+    expect(projectRefFromSupabaseUrl('https://abcdefghijklmnop.supabase.co')).toBe(
+      'abcdefghijklmnop',
     );
   });
 
   it('builds pooler URLs for Windows-friendly IPv4', () => {
-    const urls = buildSupabasePoolerUrls('bamhpwjygxoitwwymreu', 'p@ss', 'ap-northeast-2');
+    const urls = buildSupabasePoolerUrls('abcdefghijklmnop', 'test-pass', 'ap-northeast-2');
     expect(urls.databaseUrl).toContain('aws-0-ap-northeast-2.pooler.supabase.com:6543');
     expect(urls.directUrl).toContain(':5432/postgres');
-    expect(urls.databaseUrl).toContain('postgres.bamhpwjygxoitwwymreu');
+    expect(urls.databaseUrl).toContain('postgres.abcdefghijklmnop');
   });
 
   it('builds a SSL Postgres URL', () => {
-    expect(buildSupabaseDirectUrl('bamhpwjygxoitwwymreu', 'p@ss')).toBe(
-      'postgresql://postgres:p%40ss@db.bamhpwjygxoitwwymreu.supabase.co:5432/postgres?sslmode=require',
+    expect(buildSupabaseDirectUrl('abcdefghijklmnop', 'test-pass')).toBe(
+      'postgresql://postgres:test-pass@db.abcdefghijklmnop.supabase.co:5432/postgres?sslmode=require',
     );
   });
 
@@ -51,7 +51,7 @@ describe('Supabase env helpers', () => {
     capture();
     delete process.env.DATABASE_URL;
     delete process.env.DIRECT_URL;
-    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://bamhpwjygxoitwwymreu.supabase.co';
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://abcdefghijklmnop.supabase.co';
     process.env.SUPABASE_DB_PASSWORD = 'secret';
     process.env.SUPABASE_REGION = 'ap-northeast-2';
     applySupabaseDerivedDatabaseUrls();
