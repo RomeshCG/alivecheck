@@ -1,0 +1,25 @@
+{
+  "name": "@alivecheck/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate": "prisma generate",
+    "migrate": "node scripts/with-env.mjs migrate dev",
+    "migrate:deploy": "node scripts/with-env.mjs migrate deploy",
+    "build": "prisma generate"
+  },
+  "dependencies": {
+    "@alivecheck/shared": "workspace:*",
+    "@prisma/client": "^6.4.1",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^8.0.0",
+    "prisma": "^6.4.1",
+    "typescript": "^5.7.3"
+  }
+}

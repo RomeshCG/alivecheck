@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum MonitorMethod {
+  GET
+  HEAD
+}
+
+enum MonitorStatus {
+  NEW
+  UP
+  DOWN
+  RECOVERED
+}
+
+enum NotificationType {
+  SMTP
+  WEBHOOK
+}
+
+enum CheckErrorType {
+  TIMEOUT
+  DNS
+  CONNECTION
+  TLS
+  HTTP_STATUS
+  TOO_LARGE
+  SSRF
+  UNKNOWN
+}
+
+model User {
+  id           String                 @id @default(cuid())
+  email        String                 @unique
+  passwordHash String
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+  monitors     Monitor[]
+  providers    NotificationProvider[]
+  sessions     Session[]
+}
+
+model Session {
+  sid       String   @id
+  data      String   @db.Text
+  expiresAt DateTime
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+}
+
+model Monitor {
+  id                   String                 @id @default(cuid())
+  userId               String
+  user                 User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name                 String
+  url                  String
+  method               MonitorMethod          @default(GET)
+  intervalSeconds      Int                    @default(60)
+  timeoutSeconds       Int                    @default(10)
+  expectedStatus       Int                    @default(200)
+  failureThreshold     Int                    @default(3)
+  recoveryThreshold    Int                    @default(2)
+  enabled              Boolean                @default(true)
+  currentStatus        MonitorStatus          @default(NEW)
+  consecutiveFailures  Int                    @default(0)
+  consecutiveSuccesses Int                    @default(0)
+  lastCheckedAt        DateTime?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  checks               MonitorCheck[]
+  incidents            Incident[]
+  notifications        MonitorNotification[]
+
+  @@index([userId, enabled])
+  @@index([enabled, lastCheckedAt])
+}
+
+model MonitorCheck {
+  id             String          @id @default(cuid())
+  monitorId      String
+  monitor        Monitor         @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+  checkedAt      DateTime        @default(now())
+  success        Boolean
+  statusCode     Int?
+  responseTimeMs Int?
+  errorType      CheckErrorType?
+  responseSize   Int?
+
+  @@index([monitorId, checkedAt])
+}
+
+model NotificationProvider {
+  id              String                 @id @default(cuid())
+  userId          String
+  user            User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type            NotificationType
+  name            String
+  encryptedConfig String                 @db.Text
+  enabled         Boolean                @default(true)
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  monitors        MonitorNotification[]
+}
+
+model MonitorNotification {
+  id         String                 @id @default(cuid())
+  monitorId  String
+  monitor    Monitor                @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+  providerId String
+  provider   NotificationProvider   @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  enabled    Boolean                @default(true)
+
+  @@unique([monitorId, providerId])
+}
+
+model Incident {
+  id           String    @id @default(cuid())
+  monitorId    String
+  monitor      Monitor   @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+  startedAt    DateTime
+  resolvedAt   DateTime?
+  durationMs   Int?
+  errorSummary String?
+
+  @@index([monitorId, startedAt])
+}

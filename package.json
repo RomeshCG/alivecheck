@@ -1,0 +1,31 @@
+{
+  "name": "alivecheck",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Open-source uptime monitoring for developers and small teams",
+  "packageManager": "pnpm@10.29.3",
+  "scripts": {
+    "dev": "concurrently -n web,api,worker -c cyan,green,magenta \"pnpm --filter @alivecheck/web dev\" \"pnpm --filter @alivecheck/api dev\" \"pnpm --filter @alivecheck/worker dev\"",
+    "build": "pnpm --filter @alivecheck/db build && pnpm --filter @alivecheck/web build && pnpm --filter @alivecheck/api build && pnpm --filter @alivecheck/worker build",
+    "lint": "pnpm -r --if-present lint",
+    "test": "pnpm --filter @alivecheck/shared test",
+    "db:generate": "pnpm --filter @alivecheck/db generate",
+    "db:migrate": "pnpm --filter @alivecheck/db migrate",
+    "db:migrate:deploy": "pnpm --filter @alivecheck/db migrate:deploy"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "argon2",
+      "esbuild",
+      "prisma",
+      "unrs-resolver"
+    ]
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.3"
+  }
+}

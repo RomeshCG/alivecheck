@@ -1,0 +1,66 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: alivecheck
+    ports:
+      - "5432:5432"
+    volumes:
+      - alivecheck_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    profiles: ["app"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        PACKAGE: api
+    env_file: .env
+    environment:
+      API_PORT: 4000
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+    ports:
+      - "4000:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["pnpm", "--filter", "@alivecheck/api", "start"]
+
+  worker:
+    profiles: ["app"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        PACKAGE: worker
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["pnpm", "--filter", "@alivecheck/worker", "start"]
+
+  web:
+    profiles: ["app"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        PACKAGE: web
+    env_file: .env
+    environment:
+      API_URL: http://api:4000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    command: ["pnpm", "--filter", "@alivecheck/web", "start"]
+
+volumes:
+  alivecheck_data:

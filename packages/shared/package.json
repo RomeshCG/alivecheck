@@ -1,0 +1,27 @@
+{
+  "name": "@alivecheck/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./checker": "./src/checker.ts",
+    "./dispatch": "./src/dispatch.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "nodemailer": "^6.10.0",
+    "undici": "^7.3.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^6.4.17",
+    "@types/node": "^22.13.4",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.6"
+  }
+}
